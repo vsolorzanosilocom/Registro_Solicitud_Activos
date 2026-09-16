@@ -1,0 +1,6 @@
+{
+  "name": "Silocom - Registro de Solicitud de Activos",
+  "description": "Sistema de registro y control interno de solicitud de activos y equipos para Silocom C.A., integrado con Google Sheets y preparado para despliegue en Vercel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

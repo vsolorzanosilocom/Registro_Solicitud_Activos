@@ -1,0 +1,31 @@
+/**
+ * PROYECTO: Sistema de Registro de Solicitud de Activos - Silocom C.A.
+ * DESARROLLO & ARQUITECTURA: Victor Solorzano
+ * ASISTENCIA TÉCNICA: Google AI Studio & Antigravity IDE
+ * ROL: Estilos Globales y Personalización de Scrollbars
+ */
+
+@import "tailwindcss";
+
+/* Scrollbar estilizado para listas desplegables y áreas de texto */
+ul::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+ul::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+ul::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+ul::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
