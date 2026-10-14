@@ -1,110 +1,63 @@
-# SILOCOM C.A. — Sistema de Registro de Solicitud de Activos
+# SILOCOM C.A. — Registro de Solicitud de Activos
 
-Frontend moderno desarrollado en **React + Vite + TypeScript** con integración directa al backend en **Google Apps Script** y **Google Sheets** (hojas `BD` y `NUEVAS SOLICITUDES`).
+Frontend web desarrollado con React, TypeScript y Vite para consultar catálogos y registrar solicitudes de activos en Google Sheets.
 
----
+## Arquitectura
 
-## 📋 Arquitectura y Despliegue
+- **Frontend:** componentes y formularios React en `src/`.
+- **API cliente:** `src/services/api.ts` envía solicitudes HTTP POST directamente a la Web App de Google Apps Script, usando `VITE_GAS_URL` y `VITE_API_TOKEN`.
+- **Backend:** `Codigo.gs` es la copia local de referencia del script container-bound. Está integrado con la hoja de cálculo y admite tanto la interfaz nativa de Apps Script como las acciones REST que consume el frontend.
+- **Persistencia:** Google Sheets, incluyendo las pestañas `BD` y `NUEVAS SOLICITUDES`.
+- **Sin backend Vercel:** el repositorio no contiene endpoints `api/`; Vercel, si se usa, aloja el frontend estático mientras GAS ofrece la API.
 
-El sistema utiliza una arquitectura desacoplada y de alto rendimiento:
-- **Backend (Google Apps Script - Container-Bound):** Archivo `Código.gs` integrado directamente a la hoja de cálculo de Google Sheets. Provee una API REST pública protegida por token y mantiene simultáneamente la Web App interna de Apps Script.
-- **Frontend (React + Vite + TypeScript):** Interfaz rápida, ligera y adaptable (desktop y mobile), lista para desplegar en **Vercel** o ejecutar localmente con Vite.
+La copia `gas/Codigo.gs` contiene actualmente el mismo código que `Codigo.gs`. Usa `Codigo.gs` como referencia principal al actualizar el script y mantén ambas copias sincronizadas si necesitas conservar el archivo duplicado para el flujo de Apps Script.
 
----
+## Requisitos y desarrollo local
 
-## 🚀 Despliegue en Vercel
+Se requiere Node.js y npm.
 
-### Paso 1: Subir el repositorio a GitHub
-1. Inicializa git en el proyecto (si no lo has hecho):
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: migración frontend react para vercel con backend gas rest"
-   ```
-2. Crea un repositorio en GitHub y sube tu código:
-   ```bash
-   git remote add origin https://github.com/tu-usuario/silocom-solicitud-activos.git
-   git branch -M main
-   git push -u origin main
-   ```
+```bash
+npm install
+```
 
-### Paso 2: Importar el proyecto en Vercel
-1. Ingresa a tu cuenta de [Vercel](https://vercel.com).
-2. Haz clic en **"Add New..."** → **"Project"**.
-3. Selecciona tu cuenta de GitHub y haz clic en **"Import"** en el repositorio creado.
+Crea `.env.local` en la raíz del proyecto:
 
-### Paso 3: Configurar Build y Output Settings
-Vercel detecta automáticamente la configuración de Vite:
-- **Framework Preset:** Vite
-- **Build Command:** `npm run build`
-- **Output Directory:** `dist`
-- **Install Command:** `npm install`
+```env
+VITE_GAS_URL=https://script.google.com/macros/s/ID_DE_IMPLEMENTACION/exec
+VITE_API_TOKEN=REEMPLAZAR_POR_EL_TOKEN_CONFIGURADO_EN_GAS
+```
 
-### Paso 4: Configurar Variables de Entorno en Vercel
-En la sección **"Environment Variables"** de Vercel, agrega:
+Inicia Vite con `npm run dev`. Para validar tipos y compilar:
 
-| Variable | Valor | Descripción |
-| :--- | :--- | :--- |
-| `VITE_GAS_URL` | `https://script.google.com/macros/s/AKfycb.../exec` | URL generada al implementar la Web App de Google Apps Script (terminada en `/exec`) |
-| `VITE_API_TOKEN` | `SILOCOM-SOL-2026` | Token compartido configurado en `Código.gs` |
+```bash
+npm run lint
+npm run build
+```
 
-Haz clic en **"Deploy"**. En segundos tendrás tu aplicación publicada en la CDN global de Vercel.
+El directorio de salida es `dist/`.
 
----
+## Despliegue
 
-## ⚙️ Configuración del Backend en Google Apps Script
+### Frontend en Vercel
 
-1. Abre la hoja de cálculo de Google Sheets de Silocom.
-2. Ve al menú superior: **Extensiones** → **Apps Script**.
-3. Reemplaza el archivo `Código.gs` con el código provisto en `gas/Codigo.gs` (o en la raíz del proyecto `Codigo.gs`).
-4. Haz clic en el botón azul **"Implementar"** (Deploy) → **"Nueva implementación"** (New deployment).
-5. Selecciona el tipo de engranaje: **"Aplicación web"** (Web app).
-6. Configura:
-   - **Descripción:** `API REST Silocom V3`
-   - **Ejecutar como:** `Yo (tu correo electrónico)`
-   - **Quién tiene acceso:** `Cualquier persona` (Anyone) *(vital para permitir llamadas fetch desde Vercel sin login de Google)*.
-7. Haz clic en **"Implementar"** y copia la **URL de la aplicación web** terminada en `/exec`.
-8. Pega esa URL en tu archivo `.env.local` (desarrollo local) y en las variables de entorno de Vercel (producción).
+Configura el proyecto como una aplicación Vite:
 
----
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Variables de compilación:** `VITE_GAS_URL` y `VITE_API_TOKEN`
 
-## 💻 Desarrollo Local
+Configura las variables en el entorno correspondiente de Vercel y vuelve a desplegar después de cambiarlas. También se pueden usar en `.env.local` para desarrollo local.
 
-1. Instalar dependencias:
-   ```bash
-   npm install
-   ```
+### Backend en Google Apps Script
 
-2. Configurar variables locales en `.env.local`:
-   ```env
-   VITE_GAS_URL="https://script.google.com/macros/s/AKfycb.../exec"
-   VITE_API_TOKEN="SILOCOM-SOL-2026"
-   ```
+`Codigo.gs` es código fuente local, no un backend que ejecute Vercel. Publica el script container-bound como Web App desde Apps Script, con permisos y acceso apropiados para la hoja y para los usuarios previstos, y configura su URL `/exec` como `VITE_GAS_URL`.
 
-3. Iniciar el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
+## Datos y protección de fórmulas
 
-4. Compilar para producción:
-   ```bash
-   npm run build
-   ```
+- Las funciones `getFormInitialData()`, `getProductos()`, `getMarcas()` y `getModelos()` consultan los catálogos de la pestaña `BD`.
+- `guardarSolicitud()` escribe una fila en `NUEVAS SOLICITUDES`, desde la columna C hasta la N. Las columnas A y B quedan fuera de ese rango de escritura.
+- Si cambia la estructura de la hoja, verifica el mapeo en `Codigo.gs` antes de modificar el rango o desplegar cambios.
 
----
+## Seguridad de configuración
 
-## 🛡️ Estructura de Datos y Protección de Fórmulas
-
-- **Lectura:**
-  - `getFormInitialData()`: Lee datos maestros de la pestaña `BD`.
-  - `getProductos()`, `getMarcas()`, `getModelos()`: Filtros dinámicos en cascada desde la hoja `BD`.
-- **Escritura:**
-  - `guardarSolicitud()`: Escribe exclusivamente en las columnas **C a N** (columnas 3 a 14) de la hoja `NUEVAS SOLICITUDES`.
-  - Respeta y no sobrescribe ninguna columna formulada previa (A, B) ni columnas posteriores.
-
----
-
-## 👥 Autoría y Créditos
-- **Proyecto:** Sistema de Registro de Solicitud de Activos - Silocom C.A.
-- **Desarrollo & Arquitectura:** Victor Solorzano
-- **Asistencia Técnica:** Google AI Studio & Antigravity IDE
+Las variables con prefijo `VITE_` se incorporan al JavaScript servido al navegador. Por ello, `VITE_API_TOKEN` no es un secreto confidencial y no debe considerarse una barrera suficiente contra el uso no autorizado de la API. No incluyas credenciales privadas en variables `VITE_*`; aplica controles de acceso adecuados en el backend y en la configuración de Apps Script.
